@@ -1,0 +1,192 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+class reservuare
+{
+private:
+    std::string name;
+    //поле имени
+
+    int x;
+    int y;
+    int z;
+    //ширина высота глубина
+
+    enum types
+    {
+        sea,
+        ocean
+    };
+    types type;
+    //тип
+
+public:
+    reservuare() { std::cout << "reservuare()\n"; };
+    //конструктор по умолчанию
+
+    ~reservuare() { std::cout << "~reservuare()\n"; };
+    //деструктор
+
+    explicit reservuare(int x, int y, int z, bool type, std::string name)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        if (type)
+        {
+            this->type = types::ocean;
+        }
+        else
+        {
+            this->type = types::sea;
+        }
+        this->name = name;
+        std::cout << "explicit reservuare(int x,int y,int z,std::string name)\n";
+    };
+    //конструктор с параметрами и explicit
+
+    reservuare(reservuare &obj)
+    {
+        name = obj.name;
+        x = obj.x;
+        y = obj.y;
+        z = obj.z;
+        type = obj.type;
+        std::cout << "explicit reservuare(reservuare &obj)\n";
+    }
+    //конструктор копирования
+
+    int xyz() { return x * y * z; }
+    //метод определения обьёма
+
+    int xy() { return x * y; }
+    //метод определения площади
+
+    bool test_types(reservuare &reservuare2) { return (reservuare2.type == type); }
+    //метод сравнения типов
+    //& чтобы работать напрямую с обьектом а не с его копией
+
+    bool test_types_and_xyz(reservuare &reservuare2) { return (reservuare2.type == type && reservuare2.x * reservuare2.y * reservuare2.z == x * y * z); }
+    //метод сравнения площади водной поверхности водоемов одного типа;
+
+    void copy_1(reservuare &reservuare2)
+    {
+        name = reservuare2.name;
+        x = reservuare2.x;
+        y = reservuare2.y;
+        z = reservuare2.z;
+        type = reservuare2.type;
+    }
+    //метод копирования значений 1 (копирование из обьекта в круглых скобочках)
+
+    void copy_2(reservuare &reservuare2)
+    {
+        reservuare2.name = name;
+        reservuare2.x = x;
+        reservuare2.y = y;
+        reservuare2.z = z;
+        reservuare2.type = type;
+    }
+    //метод копирования значений 2 (копирование в обьект в круглых скобочках)
+
+    void set(int x, int y, int z, bool type, std::string name)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        if (type)
+        {
+            this->type = types::ocean;
+        }
+        else
+        {
+            this->type = types::sea;
+        }
+        this->name = name;
+        std::cout << "set()\n";
+    }
+    //метод set
+
+    int get(char xyz)
+    {
+        if (xyz == 'x')
+        {
+            return x;
+        }
+        else if (xyz == 'y')
+        {
+            return y;
+        }
+        else if (xyz == 'z')
+        {
+            return z;
+        }
+        else
+        {
+            std::cout << "none";
+        }
+    }
+    std::string get(std::string name)
+    {
+        if (name == "name")
+        {
+            return this->name;
+        }
+    }
+    int get()
+    {
+        return type;
+    }
+    //метод get (у него перегрузки для возвращения типа,x y z,имени)
+};
+int main()
+{
+    reservuare test1(1, 1, 1, 0, "hiiii");
+    reservuare test2(5, 2, 6, 1, "hiiii");
+    reservuare test3(5, 2, 6, 1, "hiiii");
+
+    std::cout << test1.test_types(test2) << '\n';
+    std::cout << test2.xyz() << '\n';
+    std::cout << test2.xy() << '\n';
+    std::cout << test2.test_types_and_xyz(test3) << '\n';
+    test1.set(1, 1, 1, 1, "1");
+    std::cout << test2.get() << '\n';
+
+    reservuare test4(1, 2, 3, 0, "hiiii");
+    reservuare test5(3, 4, 5, 1, "hiiii");
+    test5.copy_1(test4);
+    std::cout << test5.get('x') << '\n';
+    std::cout << test5.get('y') << '\n';
+    std::cout << test5.get('z') << '\n';
+    std::cout << test5.get() << '\n';
+    std::cout << test5.get("name") << '\n';
+    reservuare test6(6, 7, 8, 0, "hiiii");
+    test6.copy_2(test5);
+    std::cout << test5.get('x') << '\n';
+    std::cout << test5.get('y') << '\n';
+    std::cout << test5.get('z') << '\n';
+    std::cout << test5.get() << '\n';
+    std::cout << test5.get("name") << '\n';
+    reservuare test7 = test5;
+    std::cout << test7.get('x') << '\n';
+    std::cout << test7.get('y') << '\n';
+    std::cout << test7.get('z') << '\n';
+    std::cout << test7.get() << '\n';
+    std::cout << test7.get("name") << '\n';
+
+    std::vector<reservuare> vec(2);
+    vec.at(1) = test7;
+
+    std::ofstream file_cout;
+    file_cout.open("text.txt");
+    for (int i = 0; i < vec.size(); i++)
+    {
+        file_cout << vec.at(i).get("name")<<'\n';
+        file_cout << vec.at(i).get('x')<<'\n';
+        file_cout << vec.at(i).get('y')<<'\n';
+        file_cout << vec.at(i).get('z')<<'\n';
+        file_cout << vec.at(i).get()<<'\n';
+    }
+    //тесты в main
+}
